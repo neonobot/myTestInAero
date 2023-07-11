@@ -28,19 +28,19 @@ def extract_words(file_name):
     project_path = os.path.dirname(script_path)
     pdfs_path = os.path.join(project_path, 'pdfData')
     document_path = os.path.join(pdfs_path, file_name)
-
-    doc = fitz.open(document_path)
-    extracted_info = {}
-    for page in doc:
-        text = page.get_text('dict')
-        for block in text['blocks']:
-            for line in block['lines']:
-                for span in line['spans']:
-                    if block == text['blocks'][0]:
-                        parser(span, extracted_info, key=span['text'])
-                    elif ':' in span['text']:
-                        key, value = span['text'].split(':')
-                        parser(span, extracted_info, key=key)
-
+    with fitz.open(document_path) as doc:  # добавлен менеджер контекста
+        extracted_info = {}
+        for page in doc:
+            text = page.get_text('dict')
+            for block in text['blocks']:
+                for line in block['lines']:
+                    for span in line['spans']:
+                        if block == text['blocks'][0]:
+                            parser(span, extracted_info, key=span['text'])
+                        elif ':' in span['text']:
+                            key, value = span['text'].split(':')
+                            parser(span, extracted_info, key=key)
     return extracted_info
+
+
 
